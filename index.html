@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conexión Etecsa</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            padding: 2rem;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 500px;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin: 1rem;
+        }
+
+        h1 {
+            color: #1e3c72;
+            text-align: center;
+            margin-bottom: 2rem;
+            font-size: 1.8rem;
+        }
+
+        .btn {
+            display: block;
+            text-align: center;
+            text-decoration: none;
+            color: white;
+            background: #1e3c72;
+            padding: 1.2rem;
+            border-radius: 10px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            border: none;
+            width: 100%;
+            cursor: pointer;
+            font-size: 1.1rem;
+            margin: 0.5rem 0;
+        }
+
+        .btn-etecsa {
+            background: #4CAF50;
+        }
+
+        .btn-private {
+            background: #FF9800;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .contact-info {
+            margin-top: 1.5rem;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .selected-contact {
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 10px;
+            margin: 1rem 0;
+            border: 2px dashed #1e3c72;
+            color: #333;
+        }
+
+        .warning {
+            color: #ff4444;
+            text-align: center;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+            animation: shake 0.5s;
+        }
+
+        .credits {
+            color: white;
+            text-align: center;
+            margin-top: 2rem;
+            opacity: 0.8;
+        }
+
+        .about-link {
+            color: #FFD700;
+            cursor: pointer;
+            text-decoration: underline;
+        }
+
+        .about-overlay, .donation-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .about-book, .donation-card {
+            background: #fff;
+            padding: 2rem;
+            border-radius: 10px;
+            max-width: 400px;
+            position: relative;
+            text-align: center;
+        }
+
+        .qr-image {
+            width: 200px;
+            margin: 1rem auto;
+            border: 2px solid #1e3c72;
+            border-radius: 10px;
+        }
+
+        .card-number {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin: 1rem 0;
+            font-family: monospace;
+            cursor: pointer;
+        }
+
+        .about-close {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: #ff4444;
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Servicios Etecsa</h1>
+        
+        <div class="btn-group">
+            <a href="https://secure.etecsa.net:8443/" class="btn btn-etecsa">Iniciar sesión en Etecsa</a>
+            
+            <button class="btn btn-etecsa" onclick="seleccionarContacto('etecsa')">
+                Llamar con *99
+            </button>
+            
+            <button class="btn btn-private" onclick="seleccionarContacto('privado')">
+                Llamar con Número Privado (#31#)
+            </button>
+        </div>
+
+        <div class="contact-info" id="contactSection">
+            <div class="selected-contact" id="contactoSeleccionado">
+                Ningún contacto seleccionado
+            </div>
+            <div class="warning" id="warningMessage"></div>
+        </div>
+    </div>
+
+    <p class="credits">Servicios de conexión Etecsa © 2024 | 
+        <span class="about-link" onclick="showAbout()">Acerca de</span> | 
+        <span class="about-link" onclick="showDonations()">Donaciones</span>
+    </p>
+
+    <!-- Modal Acerca de -->
+    <div class="about-overlay" id="aboutOverlay">
+        <div class="about-book">
+            <button class="about-close" onclick="hideAbout()">&times;</button>
+            <div class="about-header">
+                <h2>Información del Proyecto</h2>
+            </div>
+            <div class="about-content">
+                <p>🛠️ <strong>Desarrollado por:</strong></p>
+                <h3>TecnoAdGuard</h3>
+                <p>📍 Municipio Banes, Holguín, Cuba</p>
+                <p>📞 <a href="tel:+5356639178" style="color: #1e3c72; text-decoration: none;">+53 5 663 9178</a></p>
+                <hr>
+                <p style="font-size: 0.9em; margin-top: 1rem;">
+                    <strong>Versión:</strong> 2.1.0<br>
+                    <strong>Tecnologías:</strong> HTML5, CSS3, JavaScript<br>
+                    <strong>Licencia:</strong> Uso gratuito para Cuba<br>
+                    <strong>© 2024</strong> Todos los derechos reservados
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal Donaciones -->
+    <div class="donation-overlay" id="donationOverlay">
+        <div class="donation-card">
+            <button class="about-close" onclick="hideDonations()">&times;</button>
+            <h3>❤️ Apoya este Proyecto</h3>
+            <p>Tu apoyo ayuda a mantener y mejorar esta aplicación:</p>
+            
+            <div class="card-number" onclick="copyCardNumber()">
+                🏦 Tarjeta: 9205 0699 9053 3589<br>
+                <small>(Click para copiar)</small>
+            </div>
+
+            <img src="https://i.ibb.co/355kTg7B/Screenshot-20250213-171102-Transfermvil.jpg" 
+                 alt="QR Donación" 
+                 class="qr-image">
+
+            <p style="color: #666; font-size: 0.8rem;">
+                Las donaciones son voluntarias y no Obligatorio.
+            </p>
+        </div>
+    </div>
+
+    <script>
+        let numeroBase = '';
+        let tipoLlamada = '';
+
+        function seleccionarContacto(tipo) {
+            tipoLlamada = tipo;
+            
+            if ('contacts' in navigator && 'ContactsManager' in window) {
+                const props = ['name', 'tel'];
+                const opts = {multiple: false};
+                
+                navigator.contacts.select(props, opts)
+                    .then(contacts => {
+                        if (contacts && contacts.length > 0) {
+                            const contact = contacts[0];
+                            const numero = contact.tel?.[0];
+                            
+                            if (numero) {
+                                numeroBase = numero.replace(/\D/g, '');
+                                mostrarConfirmacion(contact);
+                            } else {
+                                showError('El contacto no tiene número registrado');
+                            }
+                        }
+                    })
+                    .catch(error => {
+                        showError('Error al acceder a contactos');
+                        console.error(error);
+                    });
+            } else {
+                showError('Funcionalidad no disponible en este navegador');
+            }
+        }
+
+        function mostrarConfirmacion(contact) {
+            let codigoVisual = tipoLlamada === 'etecsa' ? '*99' : '#31#';
+            
+            document.getElementById('contactoSeleccionado').innerHTML = `
+                <strong>${contact.name || 'Contacto sin nombre'}</strong><br>
+                <span>${contact.tel?.[0]}</span><br>
+                <div class="call-options">
+                    <button class="btn ${tipoLlamada === 'etecsa' ? 'btn-etecsa' : 'btn-private'}" 
+                            onclick="realizarLlamada()">
+                        Llamar a ${codigoVisual}${numeroBase}
+                    </button>
+                </div>
+            `;
+        }
+
+        function realizarLlamada() {
+            if (numeroBase) {
+                let prefijo = tipoLlamada === 'etecsa' ? '*99' : '%2331%23';
+                window.location.href = `tel:${prefijo}${numeroBase}`;
+            } else {
+                showError('Error: Número no válido');
+            }
+        }
+
+        function showError(message) {
+            const warning = document.getElementById('warningMessage');
+            warning.textContent = message;
+            setTimeout(() => warning.textContent = '', 3000);
+        }
+
+        function showAbout() {
+            document.getElementById('aboutOverlay').style.display = 'flex';
+        }
+
+        function hideAbout() {
+            document.getElementById('aboutOverlay').style.display = 'none';
+        }
+
+        function showDonations() {
+            document.getElementById('donationOverlay').style.display = 'flex';
+        }
+
+        function hideDonations() {
+            document.getElementById('donationOverlay').style.display = 'none';
+        }
+
+        function copyCardNumber() {
+            const text = '9205069990533589';
+            navigator.clipboard.writeText(text)
+                .then(() => alert('Número copiado al portapapeles ✔️'))
+                .catch(() => alert('Error al copiar, intente manualmente'));
+        }
+
+        document.querySelectorAll('.about-overlay, .donation-overlay').forEach(modal => {
+            modal.addEventListener('click', function(e) {
+                if(e.target === this) {
+                    this.style.display = 'none';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
