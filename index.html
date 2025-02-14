@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Conexión Etecsa Universal</title>
     <style>
-        /* Estilos originales mantenidos */
+        /* Estilos anteriores se mantienen igual */
         * {
             margin: 0;
             padding: 0;
@@ -257,14 +257,11 @@
             if (navigator.contacts) {
                 navigator.contacts.select(['name', 'tel'])
                     .then(handleContact)
-                    .catch(showError);
+                    .catch(() => showManualInput());
             
             // Método alternativo para otros navegadores
             } else {
-                const numero = prompt('Ingresa el número manualmente:');
-                if (numero) {
-                    mostrarContacto('Número manual', numero);
-                }
+                showManualInput();
             }
         }
 
@@ -273,6 +270,15 @@
                 const contact = contacts[0];
                 const numero = contact.tel?.[0];
                 mostrarContacto(contact.name, numero);
+            }
+        }
+
+        function showManualInput() {
+            const numero = prompt('Ingresa el número manualmente:');
+            if (numero) {
+                mostrarContacto('Número manual', numero);
+            } else {
+                showError('No se ingresó ningún número');
             }
         }
 
